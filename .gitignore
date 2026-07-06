@@ -1,0 +1,4 @@
+node_modules/
+package-lock.json
+test-assets/face-full.jpg
+test-assets/half-face-real.jpg
