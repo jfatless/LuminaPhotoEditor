@@ -139,7 +139,7 @@
             <div id="cropOverlay" class="crop-overlay hidden"></div>
             <div id="ocrOverlay" class="ocr-overlay hidden"></div>
             <div id="forensicsOverlay" class="forensics-overlay hidden"></div>
-            <canvas id="forensicsMaskCanvas" class="hidden"></canvas>
+            <canvas id="forensicsMaskCanvas" class="forensics-mask-canvas hidden"></canvas>
           </div>
           </div>
         </main>
@@ -147,146 +147,220 @@
         <!-- Right Panel -->
         <aside class="panel" id="panel">
           <!-- Adjust Panel -->
-          <div id="adjustPanel" class="panel-content">
-            <div class="panel-section">
-              <button class="btn btn-primary" id="autoEnhanceBtn" style="width:100%">Auto Enhance</button>
+          <div class="panel-section" data-panel="adjust">
+            <h3>Adjustments</h3>
+            <div class="panel-actions">
+              <button class="btn btn-sm btn-primary" id="autoEnhanceBtn">✨ Auto Enhance</button>
+              <button class="btn btn-sm btn-ghost" id="resetAdjustBtn">Reset All</button>
             </div>
-            <div class="panel-section">
-              <h3>Adjustments</h3>
-              <div id="adjustSliders"></div>
-            </div>
+            <div class="sliders" id="adjustSliders"></div>
           </div>
 
           <!-- Filters Panel -->
-          <div id="filtersPanel" class="panel-content hidden">
-            <div class="panel-section">
-              <h3>Filters</h3>
-              <div class="filter-grid" id="filterGrid"></div>
-            </div>
+          <div class="panel-section hidden" data-panel="filters">
+            <h3>Filters</h3>
+            <div class="filter-grid" id="filterGrid"></div>
           </div>
 
           <!-- Crop Panel -->
-          <div id="cropPanel" class="panel-content hidden">
-            <div class="panel-section">
-              <h3>Crop</h3>
-              <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Drag handles on the image to crop</p>
-              <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <button class="chip" data-ratio="free">Free</button>
-                <button class="chip" data-ratio="1:1">1:1</button>
-                <button class="chip" data-ratio="4:3">4:3</button>
-                <button class="chip" data-ratio="16:9">16:9</button>
-              </div>
-              <button class="btn btn-primary" id="applyCropBtn" style="width:100%;margin-top:16px">Apply Crop</button>
+          <div class="panel-section hidden" data-panel="crop">
+            <h3>Crop</h3>
+            <div class="aspect-ratios" id="aspectRatios">
+              <button class="chip active" data-ratio="free">Free</button>
+              <button class="chip" data-ratio="1">1:1</button>
+              <button class="chip" data-ratio="4/3">4:3</button>
+              <button class="chip" data-ratio="16/9">16:9</button>
+              <button class="chip" data-ratio="3/2">3:2</button>
+              <button class="chip" data-ratio="9/16">9:16</button>
+            </div>
+            <div class="crop-actions">
+              <button class="btn btn-ghost" id="cancelCropBtn">Cancel</button>
+              <button class="btn btn-primary" id="applyCropBtn">Apply Crop</button>
             </div>
           </div>
 
           <!-- Transform Panel -->
-          <div id="transformPanel" class="panel-content hidden">
-            <div class="panel-section">
-              <h3>Transform</h3>
-              <div style="display:flex;gap:8px;margin-bottom:16px">
-                <button class="btn btn-ghost btn-sm" id="rotateLeftBtn">↺ 90°</button>
-                <button class="btn btn-ghost btn-sm" id="rotateRightBtn">↻ 90°</button>
-                <button class="btn btn-ghost btn-sm" id="flipHBtn">Flip H</button>
-                <button class="btn btn-ghost btn-sm" id="flipVBtn">Flip V</button>
-              </div>
-              <div class="slider-group">
-                <label>Straighten <span id="straightenVal">0°</span></label>
-                <input type="range" id="straightenSlider" min="-15" max="15" value="0" step="0.5">
-              </div>
-              <button class="btn btn-primary" id="applyTransformBtn" style="width:100%;margin-top:12px">Apply Transform</button>
+          <div class="panel-section hidden" data-panel="transform">
+            <h3>Transform</h3>
+            <div class="transform-grid">
+              <button class="btn btn-ghost transform-btn" id="rotateLeftBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                Rotate Left
+              </button>
+              <button class="btn btn-ghost transform-btn" id="rotateRightBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                Rotate Right
+              </button>
+              <button class="btn btn-ghost transform-btn" id="flipHBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3"/><path d="M16 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-3"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+                Flip Horizontal
+              </button>
+              <button class="btn btn-ghost transform-btn" id="flipVBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3"/><path d="M3 16v3a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                Flip Vertical
+              </button>
+            </div>
+            <div class="slider-group">
+              <label>Straighten <span id="straightenVal">0°</span></label>
+              <input type="range" id="straightenSlider" min="-45" max="45" value="0" step="0.5">
             </div>
           </div>
 
           <!-- Draw Panel -->
-          <div id="drawPanel" class="panel-content hidden">
-            <div class="panel-section">
-              <h3>Draw</h3>
-              <div class="color-swatches" id="drawColors"></div>
-              <div class="slider-group">
-                <label>Brush Size <span id="brushSizeVal">5</span></label>
-                <input type="range" id="brushSizeSlider" min="1" max="50" value="5">
-              </div>
-              <div class="slider-group">
-                <label>Opacity <span id="brushOpacityVal">100%</span></label>
-                <input type="range" id="brushOpacitySlider" min="10" max="100" value="100">
-              </div>
+          <div class="panel-section hidden" data-panel="draw">
+            <h3>Brush</h3>
+            <div class="tool-toggle">
+              <button class="chip active" id="brushModeBtn">Brush</button>
+              <button class="chip" id="eraserModeBtn">Eraser</button>
             </div>
+            <div class="color-picker-row" id="brushColorRow">
+              <label>Color</label>
+              <input type="color" id="brushColor" value="#ffffff">
+            </div>
+            <div class="slider-group">
+              <label>Size <span id="brushSizeVal">8px</span></label>
+              <input type="range" id="brushSize" min="1" max="100" value="8">
+            </div>
+            <div class="slider-group">
+              <label>Opacity <span id="brushOpacityVal">100%</span></label>
+              <input type="range" id="brushOpacity" min="1" max="100" value="100">
+            </div>
+            <button class="btn btn-ghost" id="clearDrawBtn">Clear Drawing</button>
           </div>
 
           <!-- Text Panel -->
-          <div id="textPanel" class="panel-content hidden">
-            <div class="panel-section">
-              <h3>Text</h3>
-              <p style="font-size:13px;color:var(--text-muted)">Click on the image to add text</p>
-              <input type="text" id="textInput" placeholder="Enter text..." style="width:100%;padding:8px;margin:12px 0;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:inherit">
-              <div class="slider-group">
-                <label>Size <span id="textSizeVal">32</span></label>
-                <input type="range" id="textSizeSlider" min="12" max="120" value="32">
-              </div>
+          <div class="panel-section hidden" data-panel="text">
+            <h3>Add Text</h3>
+            <input type="text" class="text-input" id="textInput" placeholder="Enter text...">
+            <div class="color-picker-row">
+              <label>Color</label>
+              <input type="color" id="textColor" value="#ffffff">
             </div>
+            <div class="slider-group">
+              <label>Size <span id="textSizeVal">48px</span></label>
+              <input type="range" id="textSize" min="12" max="200" value="48">
+            </div>
+            <select class="font-select" id="textFont">
+              <option value="Inter, sans-serif">Inter</option>
+              <option value="Georgia, serif">Georgia</option>
+              <option value="'Courier New', monospace">Courier</option>
+              <option value="Impact, sans-serif">Impact</option>
+              <option value="'Comic Sans MS', cursive">Comic Sans</option>
+            </select>
+            <p class="hint">Click on the image to place text</p>
+          </div>
+
+          <!-- Forensics Panel -->
+          <div class="panel-section hidden" data-panel="forensics">
+            <h3>Forensic Enhance</h3>
+            <p class="hint ocr-intro">Recover detail, deblur faces, reconstruct missing areas, and complete partial images.</p>
+
+            <button class="btn btn-primary forensics-hero-btn" id="forensicOneClickBtn">🔬 One-Click Enhance (2×)</button>
+            <div class="panel-actions">
+              <button class="btn btn-sm btn-ghost" id="forensic4xBtn">4× Upscale</button>
+              <button class="btn btn-sm btn-ghost" id="forensicClaheBtn">CLAHE Only</button>
+            </div>
+
+            <h4 class="forensics-subhead">AI Face Reconstruction</h4>
+            <p class="hint">One click: complete missing half → AI face restore → 2× enhance. First use downloads AI models (~350MB, then cached).</p>
+            <button class="btn btn-primary ai-face-combo-btn" id="aiCompleteRestoreBtn">✨ Complete, Restore & 2× Enhance</button>
+            <button class="btn btn-sm btn-ghost ai-face-secondary" id="aiFaceRestoreBtn">AI Restore Only (no mirror)</button>
+            <div id="faceProgress" class="ocr-progress hidden">
+              <div class="ocr-progress-track"><div id="faceProgressBar" class="ocr-progress-bar"></div></div>
+              <span id="faceProgressLabel" class="ocr-progress-label">Loading AI…</span>
+            </div>
+
+            <h4 class="forensics-subhead">Region Tools</h4>
+            <div class="ocr-mode-toggle">
+              <button class="chip active" id="forensicSelectBtn">Select Region</button>
+              <button class="chip" id="forensicMaskBtn">Paint Mask</button>
+            </div>
+            <div class="slider-group" id="forensicBrushGroup">
+              <label>Mask brush <span id="forensicBrushVal">30px</span></label>
+              <input type="range" id="forensicBrush" min="8" max="120" value="30">
+            </div>
+            <div class="forensics-actions">
+              <button class="btn btn-sm btn-ghost" id="forensicEnhanceRegionBtn">Enhance Region</button>
+              <button class="btn btn-sm btn-ghost" id="forensicDeblurBtn">Deblur Region</button>
+              <button class="btn btn-sm btn-ghost" id="forensicReconstructBtn">Reconstruct Mask</button>
+              <button class="btn btn-sm btn-ghost" id="forensicClearMaskBtn">Clear Mask</button>
+            </div>
+
+            <h4 class="forensics-subhead">Complete Missing Half</h4>
+            <p class="hint">For faces or objects cut off at the edge — mirrors the visible half.</p>
+            <div class="symmetry-grid">
+              <button class="btn btn-sm btn-ghost" id="mirrorRightBtn">Fill Right ←</button>
+              <button class="btn btn-sm btn-ghost" id="mirrorLeftBtn">Fill Left →</button>
+              <button class="btn btn-sm btn-ghost" id="mirrorBottomBtn">Fill Bottom ↑</button>
+              <button class="btn btn-sm btn-ghost" id="mirrorTopBtn">Fill Top ↓</button>
+            </div>
+            <p class="hint forensic-disclaimer">Forensic tools enhance and reconstruct from image data — results are approximations, not guaranteed accurate reconstructions.</p>
           </div>
 
           <!-- OCR Panel -->
-          <div id="ocrPanel" class="panel-content hidden">
-            <div class="panel-section">
-              <h3>Read Text (OCR)</h3>
-              <div style="display:flex;gap:8px;margin-bottom:12px">
-                <button class="chip active" data-ocr-mode="full">Full Image</button>
-                <button class="chip" data-ocr-mode="region">Select Area</button>
-              </div>
-              <select id="ocrLanguage" style="width:100%;padding:8px;margin-bottom:12px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text)">
+          <div class="panel-section hidden" data-panel="ocr">
+            <h3>Read Text (OCR)</h3>
+            <p class="hint ocr-intro">For best results: use <strong>Select Area</strong>, drag tightly around text, then Detect. Small or blurry text? Zoom in first with the Adjust tool (sharpen + contrast).</p>
+
+            <div class="ocr-mode-toggle">
+              <button class="chip active" id="ocrModeFull" data-mode="full">Full Image</button>
+              <button class="chip" id="ocrModeRegion" data-mode="region">Select Area</button>
+            </div>
+
+            <div class="slider-group">
+              <label>Language</label>
+              <select class="font-select" id="ocrLanguage">
                 <option value="eng">English</option>
                 <option value="spa">Spanish</option>
                 <option value="fra">French</option>
                 <option value="deu">German</option>
+                <option value="ita">Italian</option>
+                <option value="por">Portuguese</option>
+                <option value="chi_sim">Chinese (Simplified)</option>
+                <option value="jpn">Japanese</option>
+                <option value="kor">Korean</option>
+                <option value="ara">Arabic</option>
+                <option value="rus">Russian</option>
               </select>
-              <button class="btn btn-primary" id="ocrScanBtn" style="width:100%">Detect Text</button>
-              <div class="ocr-progress hidden" id="ocrProgress">
-                <p id="ocrProgressLabel" style="font-size:12px;color:var(--text-muted);margin:8px 0 4px"></p>
-                <div class="ocr-progress-bar"><div id="ocrProgressBar" style="width:0%"></div></div>
-              </div>
-              <p id="ocrResultCount" style="font-size:12px;color:var(--text-muted);margin-top:12px">No text detected yet</p>
-              <div class="ocr-results" id="ocrResultsList"></div>
-              <textarea id="ocrFullText" readonly style="width:100%;height:80px;margin-top:8px;padding:8px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:12px;resize:vertical"></textarea>
-              <div style="display:flex;gap:8px;margin-top:8px">
-                <button class="btn btn-ghost btn-sm" id="ocrCopyAllBtn">Copy All</button>
-                <button class="btn btn-ghost btn-sm" id="ocrCopySelBtn">Copy Selected</button>
-              </div>
-              <div id="ocrIsolatePreview" class="hidden" style="margin-top:12px">
-                <p style="font-size:12px;color:var(--text-muted)">Isolated: <span id="ocrIsolateText"></span></p>
-                <img id="ocrIsolateImg" style="max-width:100%;margin-top:4px;border-radius:var(--radius-sm)">
-                <button class="btn btn-ghost btn-sm" id="ocrSaveIsolateBtn" style="margin-top:4px">Save as PNG</button>
-              </div>
-              <div id="ocrFontMatch" class="ocr-font-match hidden">
-                <h4 style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Font Match</h4>
-                <div id="ocrFontTop"></div>
-                <ul id="ocrFontList" style="font-size:12px;margin-top:8px;list-style:none"></ul>
-                <p id="ocrFontNote" style="font-size:11px;color:var(--text-muted);margin-top:8px"></p>
-              </div>
             </div>
-          </div>
 
-          <!-- Forensics Panel -->
-          <div id="forensicsPanel" class="panel-content hidden">
-            <div class="panel-section">
-              <h3>Forensic Enhance</h3>
-              <button class="btn btn-primary" id="aiCompleteRestoreBtn" style="width:100%;margin-bottom:8px">Complete & Restore Face (2×)</button>
-              <button class="btn btn-ghost" id="aiFaceRestoreBtn" style="width:100%;margin-bottom:8px">AI Face Restore Only</button>
-              <button class="btn btn-ghost" id="oneClickEnhanceBtn" style="width:100%;margin-bottom:8px">2× Enhance Full Image</button>
-              <div class="face-progress hidden" id="faceProgress">
-                <p id="faceProgressLabel" style="font-size:12px;color:var(--text-muted);margin:4px 0"></p>
-                <div class="face-progress-bar"><div id="faceProgressBar" style="width:0%"></div></div>
+            <button class="btn btn-primary ocr-scan-btn" id="ocrScanBtn">Detect Text</button>
+
+            <div id="ocrProgress" class="ocr-progress hidden">
+              <div class="ocr-progress-track"><div id="ocrProgressBar" class="ocr-progress-bar"></div></div>
+              <span id="ocrProgressLabel" class="ocr-progress-label">Scanning…</span>
+            </div>
+
+            <p class="ocr-count" id="ocrResultCount">No text detected yet</p>
+
+            <div class="ocr-actions">
+              <button class="btn btn-sm btn-ghost" id="ocrCopyAllBtn">Copy All</button>
+              <button class="btn btn-sm btn-ghost" id="ocrCopySelBtn">Copy Selected</button>
+              <button class="btn btn-sm btn-ghost" id="ocrClearBtn">Clear</button>
+            </div>
+
+            <div class="ocr-results-list" id="ocrResultsList">
+              <p class="ocr-empty">Click "Detect Text" to scan the image</p>
+            </div>
+
+            <div class="slider-group">
+              <label>Full text</label>
+              <textarea class="ocr-textarea" id="ocrFullText" readonly placeholder="Detected text will appear here…"></textarea>
+            </div>
+
+            <div id="ocrIsolatePreview" class="ocr-isolate hidden">
+              <label>Isolated text</label>
+              <div class="ocr-isolate-img-wrap">
+                <img id="ocrIsolateImg" alt="Isolated text region">
               </div>
-              <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
-              <div style="display:flex;gap:8px;margin-bottom:12px">
-                <button class="chip active" data-forensics-mode="select">Select Region</button>
-                <button class="chip" data-forensics-mode="mask">Paint Mask</button>
+              <p class="ocr-isolate-text" id="ocrIsolateText"></p>
+              <div id="ocrFontMatch" class="ocr-font-match hidden">
+                <label>Likely font</label>
+                <div class="ocr-font-top" id="ocrFontTop"></div>
+                <ul class="ocr-font-list" id="ocrFontList"></ul>
+                <p class="hint" id="ocrFontNote">Best guess based on letter shapes — exact matches may vary.</p>
               </div>
-              <button class="btn btn-ghost btn-sm" id="enhanceRegionBtn" style="width:100%;margin-bottom:4px">Enhance Region</button>
-              <button class="btn btn-ghost btn-sm" id="deblurRegionBtn" style="width:100%;margin-bottom:4px">Deblur Region</button>
-              <button class="btn btn-ghost btn-sm" id="reconstructMaskBtn" style="width:100%;margin-bottom:4px">Reconstruct Masked Area</button>
-              <button class="btn btn-ghost btn-sm" id="clearForensicsBtn" style="width:100%">Clear Selection/Mask</button>
+              <button class="btn btn-sm btn-primary" id="ocrSaveIsolateBtn">Save Region as PNG</button>
             </div>
           </div>
         </aside>
@@ -298,18 +372,21 @@
       <div class="modal-backdrop"></div>
       <div class="modal-content">
         <h2>Export Image</h2>
-        <div class="format-btns">
-          <button class="chip active" data-format="png">PNG</button>
-          <button class="chip" data-format="jpeg">JPEG</button>
-          <button class="chip" data-format="webp">WebP</button>
-        </div>
-        <div id="qualityGroup" style="display:none">
-          <div class="slider-group">
-            <label>Quality <span id="qualityVal">92%</span></label>
-            <input type="range" id="qualitySlider" min="50" max="100" value="92">
+        <div class="export-options">
+          <div class="export-format">
+            <label>Format</label>
+            <div class="format-btns">
+              <button class="chip active" data-format="png">PNG</button>
+              <button class="chip" data-format="jpeg">JPEG</button>
+              <button class="chip" data-format="webp">WEBP</button>
+            </div>
           </div>
+          <div class="slider-group" id="qualityGroup">
+            <label>Quality <span id="qualityVal">92%</span></label>
+            <input type="range" id="qualitySlider" min="10" max="100" value="92">
+          </div>
+          <div class="export-info" id="exportInfo"></div>
         </div>
-        <p id="exportInfo" style="font-size:13px;color:var(--text-muted);margin-top:8px"></p>
         <div class="modal-actions">
           <button class="btn btn-ghost" id="cancelExportBtn">Cancel</button>
           <button class="btn btn-primary" id="confirmExportBtn">Download</button>
@@ -320,17 +397,18 @@
     <!-- Help Modal -->
     <div id="helpModal" class="modal hidden">
       <div class="modal-backdrop"></div>
-      <div class="modal-content">
+      <div class="modal-content modal-wide">
         <h2>Keyboard Shortcuts</h2>
-        <div class="shortcuts-grid">
-          <div class="shortcut"><span>Undo</span><kbd>Ctrl+Z</kbd></div>
-          <div class="shortcut"><span>Redo</span><kbd>Ctrl+Y</kbd></div>
-          <div class="shortcut"><span>Export</span><kbd>Ctrl+S</kbd></div>
-          <div class="shortcut"><span>Zoom In</span><kbd>+</kbd></div>
-          <div class="shortcut"><span>Zoom Out</span><kbd>-</kbd></div>
-          <div class="shortcut"><span>Fit Screen</span><kbd>0</kbd></div>
-          <div class="shortcut"><span>Pan</span><kbd>Space+Drag</kbd></div>
-          <div class="shortcut"><span>Help</span><kbd>?</kbd></div>
+        <div class="shortcut-grid">
+          <div><kbd>Ctrl</kbd> + <kbd>Z</kbd></div><div>Undo</div>
+          <div><kbd>Ctrl</kbd> + <kbd>Y</kbd></div><div>Redo</div>
+          <div><kbd>Ctrl</kbd> + <kbd>S</kbd></div><div>Export</div>
+          <div><kbd>+</kbd> / <kbd>-</kbd></div><div>Zoom in / out</div>
+          <div><kbd>Space</kbd> + drag</div><div>Pan canvas</div>
+          <div><kbd>Scroll</kbd></div><div>Zoom at cursor</div>
+          <div><kbd>?</kbd></div><div>Show this help</div>
+          <div><strong>Read tool</strong></div><div>Detect &amp; isolate text in images (OCR)</div>
+          <div><strong>Forensics tool</strong></div><div>One-click: complete half → AI face restore → 2× enhance</div>
         </div>
         <div class="modal-actions">
           <button class="btn btn-primary" id="closeHelpBtn">Got it</button>
@@ -340,31 +418,24 @@
 
     <!-- Loading Overlay -->
     <div id="loading" class="loading hidden">
-      <div class="spinner"></div>
+      <div class="loading-spinner"></div>
       <p>Processing image…</p>
     </div>
 
     <!-- Toast -->
-    <div id="toast" class="toast"></div>
+    <div id="toast" class="toast hidden"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="js/filters.js"></script>
   <script src="js/engine.js"></script>
-  <script src="js/crop.js"></script>
-  <script src="js/draw.js"></script>
-  <script src="js/text.js"></script>
+  <script src="js/tools.js"></script>
+  <script src="js/forensics-engine.js"></script>
+  <script src="js/face-restore.js"></script>
+  <script src="js/forensics-tool.js"></script>
   <script src="js/ocr-preprocess.js"></script>
   <script src="js/font-id.js"></script>
   <script src="js/ocr.js"></script>
-  <script src="js/face-restore.js"></script>
-  <script src="js/forensics-engine.js"></script>
-  <script src="js/forensics-tool.js"></script>
   <script src="js/app.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      window.app = new LuminaApp();
-    });
-  </script>
 </body>
 </html>
