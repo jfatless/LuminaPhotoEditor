@@ -33,17 +33,17 @@ class FaceRestore {
       ? { executionProviders: ['webgpu'], graphOptimizationLevel: 'all' }
       : { executionProviders: ['wasm'], graphOptimizationLevel: 'all' };
 
-    onProgress?.(5, 'Downloading face detector…');
+    onProgress?.(5, 'Downloading face detectorΓÇª');
     const yoloBuf = await this._download(FACE_MODEL_URLS.yolo, (c, t) => {
-      onProgress?.(5 + (c / (t || 1)) * 25, 'Downloading face detector…');
+      onProgress?.(5 + (c / (t || 1)) * 25, 'Downloading face detectorΓÇª');
     });
 
-    onProgress?.(35, 'Downloading GFPGAN AI model…');
+    onProgress?.(35, 'Downloading GFPGAN AI modelΓÇª');
     const gfpganBuf = await this._download(FACE_MODEL_URLS.gfpgan, (c, t) => {
-      onProgress?.(35 + (c / (t || 1)) * 45, 'Downloading GFPGAN (~330MB first time)…');
+      onProgress?.(35 + (c / (t || 1)) * 45, 'Downloading GFPGAN (~330MB first time)ΓÇª');
     });
 
-    onProgress?.(85, 'Loading AI models…');
+    onProgress?.(85, 'Loading AI modelsΓÇª');
     try {
       this.yoloSession = await ort.InferenceSession.create(yoloBuf, sessionOpts);
     } catch {
@@ -66,14 +66,14 @@ class FaceRestore {
     const h = imageData.height;
     let data = this._toFloatHWC(imageData);
 
-    onProgress?.(10, 'Detecting faces…');
+    onProgress?.(10, 'Detecting facesΓÇª');
     const faces = await this._detectFaces(data, w, h);
     if (faces.length === 0) return { imageData, faceCount: 0 };
 
-    onProgress?.(20, `Reconstructing ${faces.length} face${faces.length > 1 ? 's' : ''}…`);
+    onProgress?.(20, `Reconstructing ${faces.length} face${faces.length > 1 ? 's' : ''}ΓÇª`);
     for (let i = 0; i < faces.length; i++) {
       const pct = 20 + ((i + 1) / faces.length) * 75;
-      onProgress?.(pct, `AI restoring face ${i + 1} of ${faces.length}…`);
+      onProgress?.(pct, `AI restoring face ${i + 1} of ${faces.length}ΓÇª`);
       const { data: faceIn, cropBox } = this._cropFace(data, w, h, faces[i], GFPGAN_SIZE);
       const enhanced = await this._runGFPGAN(faceIn);
       const mask = this._ellipseMask(GFPGAN_SIZE);

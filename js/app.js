@@ -145,7 +145,7 @@ class LuminaApp {
     });
     const straighten = this.engine.straighten;
     document.getElementById('straightenSlider').value = straighten;
-    document.getElementById('straightenVal').textContent = straighten + '°';
+    document.getElementById('straightenVal').textContent = straighten + '┬░';
   }
 
   _updateFilterThumbnails() {
@@ -281,7 +281,7 @@ class LuminaApp {
 
     document.getElementById('straightenSlider').addEventListener('input', e => {
       const val = parseFloat(e.target.value);
-      document.getElementById('straightenVal').textContent = val + '°';
+      document.getElementById('straightenVal').textContent = val + '┬░';
       this.engine.setStraighten(val);
       this._applyZoom();
       this._scheduleRender();
@@ -649,7 +649,7 @@ class LuminaApp {
   _updateExportInfo() {
     const dims = this.engine.getOutputDimensions();
     const info = document.getElementById('exportInfo');
-    info.textContent = `${dims.width} × ${dims.height} pixels · ${this.exportFormat.toUpperCase()}`;
+    info.textContent = `${dims.width} ├ù ${dims.height} pixels ┬╖ ${this.exportFormat.toUpperCase()}`;
   }
 
   exportImage() {
