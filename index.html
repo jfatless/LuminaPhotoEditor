@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lumina — Photo Editor</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23818cf8'/><circle cx='16' cy='16' r='6' fill='%23c084fc'/></svg>">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <!-- Welcome / Drop Zone -->
+    <div id="welcome" class="welcome">
+      <div class="welcome-content">
+        <div class="logo">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <circle cx="32" cy="32" r="28" stroke="url(#grad)" stroke-width="3"/>
+            <circle cx="32" cy="32" r="12" fill="url(#grad)"/>
+            <defs>
+              <linearGradient id="grad" x1="0" y1="0" x2="64" y2="64">
+                <stop offset="0%" stop-color="#818cf8"/>
+                <stop offset="100%" stop-color="#c084fc"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <h1>Lumina</h1>
+        <p class="tagline">Advanced photo editing, beautifully simple</p>
+        <div class="drop-zone" id="dropZone">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <p>Drag & drop a photo here</p>
+          <span>or</span>
+          <button class="btn btn-primary" id="openBtn">Open Photo</button>
+          <input type="file" id="fileInput" accept="image/*" hidden>
+        </div>
+        <div class="welcome-hints">
+          <span>PNG · JPG · WEBP · GIF</span>
+          <span>OCR · Forensic AI restore · No uploads</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Editor -->
+    <div id="editor" class="editor hidden">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="btn-icon" id="homeBtn" title="New image">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          </button>
+          <span class="app-name">Lumina</span>
+          <span class="file-name" id="fileName">Untitled</span>
+        </div>
+        <div class="topbar-center">
+          <button class="btn-icon" id="undoBtn" title="Undo (Ctrl+Z)" disabled>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+          </button>
+          <button class="btn-icon" id="redoBtn" title="Redo (Ctrl+Y)" disabled>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
+          </button>
+          <div class="divider-v"></div>
+          <button class="btn-icon" id="zoomOutBtn" title="Zoom out">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </button>
+          <span class="zoom-label" id="zoomLabel">100%</span>
+          <button class="btn-icon" id="zoomInBtn" title="Zoom in">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </button>
+          <button class="btn-icon" id="fitBtn" title="Fit to screen">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
+          </button>
+        </div>
+        <div class="topbar-right">
+          <button class="btn-icon" id="helpBtn" title="Keyboard shortcuts (?)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </button>
+          <button class="btn btn-ghost" id="compareBtn" title="Hold to compare with original">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+            Compare
+          </button>
+          <button class="btn btn-primary" id="exportBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+          </button>
+        </div>
+      </header>
+
+      <div class="workspace">
+        <!-- Left Toolbar -->
+        <nav class="toolbar" id="toolbar">
+          <button class="tool-btn active" data-tool="adjust" title="Adjust">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            <span>Adjust</span>
+          </button>
+          <button class="tool-btn" data-tool="filters" title="Filters">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            <span>Filters</span>
+          </button>
+          <button class="tool-btn" data-tool="crop" title="Crop">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"/><path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"/></svg>
+            <span>Crop</span>
+          </button>
+          <button class="tool-btn" data-tool="transform" title="Transform">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <span>Transform</span>
+          </button>
+          <button class="tool-btn" data-tool="draw" title="Draw">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
+            <span>Draw</span>
+          </button>
+          <button class="tool-btn" data-tool="text" title="Text">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+            <span>Text</span>
+          </button>
+          <button class="tool-btn" data-tool="ocr" title="Read Text (OCR)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/><path d="M8 12h8"/></svg>
+            <span>Read</span>
+          </button>
+          <button class="tool-btn" data-tool="forensics" title="Forensic Enhance">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6"/><path d="M8 11h6"/></svg>
+            <span>Forensics</span>
+          </button>
+        </nav>
+
+        <!-- Canvas Area -->
+        <main class="canvas-area" id="canvasArea">
+          <div class="pan-hint hidden" id="panHint">Hold Space + drag to pan · Scroll to zoom</div>
+          <div class="canvas-scroll" id="canvasScroll">
+          <div class="canvas-wrapper" id="canvasWrapper">
+            <canvas id="mainCanvas"></canvas>
+            <canvas id="overlayCanvas"></canvas>
+            <div id="cropOverlay" class="crop-overlay hidden"></div>
+            <div id="ocrOverlay" class="ocr-overlay hidden"></div>
+            <div id="forensicsOverlay" class="forensics-overlay hidden"></div>
+            <canvas id="forensicsMaskCanvas" class="hidden"></canvas>
+          </div>
+          </div>
+        </main>
+
+        <!-- Right Panel -->
+        <aside class="panel" id="panel">
+          <!-- Adjust Panel -->
+          <div id="adjustPanel" class="panel-content">
+            <div class="panel-section">
+              <button class="btn btn-primary" id="autoEnhanceBtn" style="width:100%">Auto Enhance</button>
+            </div>
+            <div class="panel-section">
+              <h3>Adjustments</h3>
+              <div id="adjustSliders"></div>
+            </div>
+          </div>
+
+          <!-- Filters Panel -->
+          <div id="filtersPanel" class="panel-content hidden">
+            <div class="panel-section">
+              <h3>Filters</h3>
+              <div class="filter-grid" id="filterGrid"></div>
+            </div>
+          </div>
+
+          <!-- Crop Panel -->
+          <div id="cropPanel" class="panel-content hidden">
+            <div class="panel-section">
+              <h3>Crop</h3>
+              <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Drag handles on the image to crop</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="chip" data-ratio="free">Free</button>
+                <button class="chip" data-ratio="1:1">1:1</button>
+                <button class="chip" data-ratio="4:3">4:3</button>
+                <button class="chip" data-ratio="16:9">16:9</button>
+              </div>
+              <button class="btn btn-primary" id="applyCropBtn" style="width:100%;margin-top:16px">Apply Crop</button>
+            </div>
+          </div>
+
+          <!-- Transform Panel -->
+          <div id="transformPanel" class="panel-content hidden">
+            <div class="panel-section">
+              <h3>Transform</h3>
+              <div style="display:flex;gap:8px;margin-bottom:16px">
+                <button class="btn btn-ghost btn-sm" id="rotateLeftBtn">↺ 90°</button>
+                <button class="btn btn-ghost btn-sm" id="rotateRightBtn">↻ 90°</button>
+                <button class="btn btn-ghost btn-sm" id="flipHBtn">Flip H</button>
+                <button class="btn btn-ghost btn-sm" id="flipVBtn">Flip V</button>
+              </div>
+              <div class="slider-group">
+                <label>Straighten <span id="straightenVal">0°</span></label>
+                <input type="range" id="straightenSlider" min="-15" max="15" value="0" step="0.5">
+              </div>
+              <button class="btn btn-primary" id="applyTransformBtn" style="width:100%;margin-top:12px">Apply Transform</button>
+            </div>
+          </div>
+
+          <!-- Draw Panel -->
+          <div id="drawPanel" class="panel-content hidden">
+            <div class="panel-section">
+              <h3>Draw</h3>
+              <div class="color-swatches" id="drawColors"></div>
+              <div class="slider-group">
+                <label>Brush Size <span id="brushSizeVal">5</span></label>
+                <input type="range" id="brushSizeSlider" min="1" max="50" value="5">
+              </div>
+              <div class="slider-group">
+                <label>Opacity <span id="brushOpacityVal">100%</span></label>
+                <input type="range" id="brushOpacitySlider" min="10" max="100" value="100">
+              </div>
+            </div>
+          </div>
+
+          <!-- Text Panel -->
+          <div id="textPanel" class="panel-content hidden">
+            <div class="panel-section">
+              <h3>Text</h3>
+              <p style="font-size:13px;color:var(--text-muted)">Click on the image to add text</p>
+              <input type="text" id="textInput" placeholder="Enter text..." style="width:100%;padding:8px;margin:12px 0;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:inherit">
+              <div class="slider-group">
+                <label>Size <span id="textSizeVal">32</span></label>
+                <input type="range" id="textSizeSlider" min="12" max="120" value="32">
+              </div>
+            </div>
+          </div>
+
+          <!-- OCR Panel -->
+          <div id="ocrPanel" class="panel-content hidden">
+            <div class="panel-section">
+              <h3>Read Text (OCR)</h3>
+              <div style="display:flex;gap:8px;margin-bottom:12px">
+                <button class="chip active" data-ocr-mode="full">Full Image</button>
+                <button class="chip" data-ocr-mode="region">Select Area</button>
+              </div>
+              <select id="ocrLanguage" style="width:100%;padding:8px;margin-bottom:12px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text)">
+                <option value="eng">English</option>
+                <option value="spa">Spanish</option>
+                <option value="fra">French</option>
+                <option value="deu">German</option>
+              </select>
+              <button class="btn btn-primary" id="ocrScanBtn" style="width:100%">Detect Text</button>
+              <div class="ocr-progress hidden" id="ocrProgress">
+                <p id="ocrProgressLabel" style="font-size:12px;color:var(--text-muted);margin:8px 0 4px"></p>
+                <div class="ocr-progress-bar"><div id="ocrProgressBar" style="width:0%"></div></div>
+              </div>
+              <p id="ocrResultCount" style="font-size:12px;color:var(--text-muted);margin-top:12px">No text detected yet</p>
+              <div class="ocr-results" id="ocrResultsList"></div>
+              <textarea id="ocrFullText" readonly style="width:100%;height:80px;margin-top:8px;padding:8px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:12px;resize:vertical"></textarea>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button class="btn btn-ghost btn-sm" id="ocrCopyAllBtn">Copy All</button>
+                <button class="btn btn-ghost btn-sm" id="ocrCopySelBtn">Copy Selected</button>
+              </div>
+              <div id="ocrIsolatePreview" class="hidden" style="margin-top:12px">
+                <p style="font-size:12px;color:var(--text-muted)">Isolated: <span id="ocrIsolateText"></span></p>
+                <img id="ocrIsolateImg" style="max-width:100%;margin-top:4px;border-radius:var(--radius-sm)">
+                <button class="btn btn-ghost btn-sm" id="ocrSaveIsolateBtn" style="margin-top:4px">Save as PNG</button>
+              </div>
+              <div id="ocrFontMatch" class="ocr-font-match hidden">
+                <h4 style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Font Match</h4>
+                <div id="ocrFontTop"></div>
+                <ul id="ocrFontList" style="font-size:12px;margin-top:8px;list-style:none"></ul>
+                <p id="ocrFontNote" style="font-size:11px;color:var(--text-muted);margin-top:8px"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Forensics Panel -->
+          <div id="forensicsPanel" class="panel-content hidden">
+            <div class="panel-section">
+              <h3>Forensic Enhance</h3>
+              <button class="btn btn-primary" id="aiCompleteRestoreBtn" style="width:100%;margin-bottom:8px">Complete & Restore Face (2×)</button>
+              <button class="btn btn-ghost" id="aiFaceRestoreBtn" style="width:100%;margin-bottom:8px">AI Face Restore Only</button>
+              <button class="btn btn-ghost" id="oneClickEnhanceBtn" style="width:100%;margin-bottom:8px">2× Enhance Full Image</button>
+              <div class="face-progress hidden" id="faceProgress">
+                <p id="faceProgressLabel" style="font-size:12px;color:var(--text-muted);margin:4px 0"></p>
+                <div class="face-progress-bar"><div id="faceProgressBar" style="width:0%"></div></div>
+              </div>
+              <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
+              <div style="display:flex;gap:8px;margin-bottom:12px">
+                <button class="chip active" data-forensics-mode="select">Select Region</button>
+                <button class="chip" data-forensics-mode="mask">Paint Mask</button>
+              </div>
+              <button class="btn btn-ghost btn-sm" id="enhanceRegionBtn" style="width:100%;margin-bottom:4px">Enhance Region</button>
+              <button class="btn btn-ghost btn-sm" id="deblurRegionBtn" style="width:100%;margin-bottom:4px">Deblur Region</button>
+              <button class="btn btn-ghost btn-sm" id="reconstructMaskBtn" style="width:100%;margin-bottom:4px">Reconstruct Masked Area</button>
+              <button class="btn btn-ghost btn-sm" id="clearForensicsBtn" style="width:100%">Clear Selection/Mask</button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal hidden">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content">
+        <h2>Export Image</h2>
+        <div class="format-btns">
+          <button class="chip active" data-format="png">PNG</button>
+          <button class="chip" data-format="jpeg">JPEG</button>
+          <button class="chip" data-format="webp">WebP</button>
+        </div>
+        <div id="qualityGroup" style="display:none">
+          <div class="slider-group">
+            <label>Quality <span id="qualityVal">92%</span></label>
+            <input type="range" id="qualitySlider" min="50" max="100" value="92">
+          </div>
+        </div>
+        <p id="exportInfo" style="font-size:13px;color:var(--text-muted);margin-top:8px"></p>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" id="cancelExportBtn">Cancel</button>
+          <button class="btn btn-primary" id="confirmExportBtn">Download</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal hidden">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content">
+        <h2>Keyboard Shortcuts</h2>
+        <div class="shortcuts-grid">
+          <div class="shortcut"><span>Undo</span><kbd>Ctrl+Z</kbd></div>
+          <div class="shortcut"><span>Redo</span><kbd>Ctrl+Y</kbd></div>
+          <div class="shortcut"><span>Export</span><kbd>Ctrl+S</kbd></div>
+          <div class="shortcut"><span>Zoom In</span><kbd>+</kbd></div>
+          <div class="shortcut"><span>Zoom Out</span><kbd>-</kbd></div>
+          <div class="shortcut"><span>Fit Screen</span><kbd>0</kbd></div>
+          <div class="shortcut"><span>Pan</span><kbd>Space+Drag</kbd></div>
+          <div class="shortcut"><span>Help</span><kbd>?</kbd></div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="closeHelpBtn">Got it</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <p>Processing image…</p>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/crop.js"></script>
+  <script src="js/draw.js"></script>
+  <script src="js/text.js"></script>
+  <script src="js/ocr-preprocess.js"></script>
+  <script src="js/font-id.js"></script>
+  <script src="js/ocr.js"></script>
+  <script src="js/face-restore.js"></script>
+  <script src="js/forensics-engine.js"></script>
+  <script src="js/forensics-tool.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      window.app = new LuminaApp();
+    });
+  </script>
+</body>
+</html>
